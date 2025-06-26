@@ -9,7 +9,13 @@ const port = 3000;
 
 // ✅ Log CORS setup
 console.log("🚀 Enabling CORS for http://localhost:5173");
-app.use(cors({ origin: 'http://localhost:5173' }));
+// ✅ Allow both local dev and S3 frontend
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://my-frontend-app-swym.s3-website-us-east-1.amazonaws.com'
+  ]
+}));
 
 // ✅ Middleware
 app.use(express.json());

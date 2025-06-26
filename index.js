@@ -2,12 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const AWS = require('aws-sdk');
+const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const port = 3000;
-const cors = require('cors');
 
-// Configure AWS SDK
+// ✅ CORS should be here, before routes
+app.use(cors({ origin: 'http://localhost:5173' }));
+
+// AWS SDK config
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -17,7 +21,6 @@ AWS.config.update({
 const s3 = new AWS.S3();
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-// Multer setup (memory storage)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -29,14 +32,10 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
   const { name, email } = req.body;
   const file = req.file;
-app.use(cors({
-  origin: 'http://localhost:5173'
-}));
 
   if (!file || !email || !name) {
     return res.status(400).json({ error: 'Missing fields' });
   }
-
 
   const s3Params = {
     Bucket: process.env.S3_BUCKET_NAME,

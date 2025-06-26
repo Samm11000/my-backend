@@ -5,6 +5,7 @@ const AWS = require('aws-sdk');
 
 const app = express();
 const port = 3000;
+const cors = require('cors');
 
 // Configure AWS SDK
 AWS.config.update({
@@ -23,12 +24,19 @@ const upload = multer({ storage });
 app.use(express.json());
 
 app.post('/upload', upload.single('file'), async (req, res) => {
+  console.log('REQ BODY:', req.body);
+  console.log('REQ FILE:', req.file);
+
   const { name, email } = req.body;
   const file = req.file;
+app.use(cors({
+  origin: 'http://localhost:5173'
+}));
 
   if (!file || !email || !name) {
     return res.status(400).json({ error: 'Missing fields' });
   }
+
 
   const s3Params = {
     Bucket: process.env.S3_BUCKET_NAME,
